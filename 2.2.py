@@ -1,5 +1,4 @@
 import sys
-from collections import Counter
 
 valid = 0
 for line in sys.stdin:
