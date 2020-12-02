@@ -1,0 +1,5 @@
+#!/bin/bash
+
+DAY=${1:?day}
+
+curl -LsS https://adventofcode.com/2020/day/$DAY/input -H "Cookie: $(cat .cookie)"
