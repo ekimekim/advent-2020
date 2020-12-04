@@ -17,14 +17,13 @@ required = {
 	'pid': lambda v: re.match('^[0-9]{9}$', v)
 }
 
-def valid(k, v):
-	f = required[k]
+def valid(f, v):
 	try:
 		return f(v)
 	except Exception:
 		return False
 
 print len([p for p in passports if all(
-	(k in p) and valid(k, p[k])
-	for k in required
+	(k in p) and valid(f, p[k])
+	for k, f in required.items()
 )])
