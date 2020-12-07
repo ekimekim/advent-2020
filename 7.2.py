@@ -27,16 +27,7 @@ def parse_content(content):
 # {outer: [(n, inner)]}
 rules = dict(map(parse, sys.stdin.read().strip().split('\n')))
 
-def can_have_ours(color):
-	if color == 'shiny gold':
-		return True
-	return any(
-		can_have_ours(child)
-		for n, child in rules[color]
-	)
+def count(color):
+	return 1 + sum(n * count(child) for n, child in rules[color])
 
-n = 0
-for color in rules:
-	if can_have_ours(color):
-		n += 1
-print n - 1 # don't count gold itself
+print count('shiny gold') - 1 # don't count outermost bag
