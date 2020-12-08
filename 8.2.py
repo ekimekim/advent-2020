@@ -29,7 +29,9 @@ def run(instrs):
 for n, (i, a) in enumerate(instrs):
 	if i == 'acc':
 		continue
-	i = 'jmp' if i == 'nop' else 'nop'
-	acc, ip = run(instrs[:n] + [(i, a)] + instrs[n+1:])
+	new_i = 'jmp' if i == 'nop' else 'nop'
+	instrs[n] = new_i, a
+	acc, ip = run(instrs)
+	instrs[n] = i, a
 	if ip == len(instrs):
 		print acc
