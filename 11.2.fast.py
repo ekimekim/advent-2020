@@ -6,14 +6,17 @@ seats = [
 	list(line.strip())
 	for line in sys.stdin
 ]
+ROW_LEN = len(seats[0])
+COL_LEN = len(seats)
+seats = sum(seats, [])
 
 def cast(seats, x, y, dx, dy):
 	while True:
 		x += dx
 		y += dy
-		if x < 0 or y < 0 or y >= len(seats) or x >= len(seats[y]):
+		if x < 0 or y < 0 or y >= COL_LEN or x >= ROW_LEN:
 			return False
-		c = seats[y][x]
+		c = seats[y * ROW_LEN + x]
 		if c != '.':
 			return c == '#'
 
@@ -24,38 +27,34 @@ DELTAS = [
 ]
 
 def step(seats):
-	new_seats = [list(line) for line in seats]
-	for y in range(len(new_seats)):
-		for x in range(len(new_seats[y])):
-			if seats[y][x] == '.':
+	new_seats = seats[:]
+	for y in range(COL_LEN):
+		for x in range(ROW_LEN):
+			if seats[y * ROW_LEN + x] == '.':
 				continue
-			elif seats[y][x] == 'L':
+			elif seats[y * ROW_LEN + x] == 'L':
 				for dx, dy in DELTAS: 
 					if cast(seats, x, y, dx, dy):
 						break
 				else:
-					new_seats[y][x] = '#'
+					new_seats[y * ROW_LEN + x] = '#'
 			else:
 				count = 0
 				for dx, dy in DELTAS:
 					if cast(seats, x, y, dx, dy):
 						count += 1
 						if count == 5:
-							new_seats[y][x] = 'L'
+							new_seats[y * ROW_LEN + x] = 'L'
 							break
 
 	return new_seats
 
-def p(seats):
-	print '\n'.join(''.join(line) for line in seats)
 
 while True:
 	new_seats = step(seats)
-	p(new_seats)
-	print
 	if seats == new_seats:
 		break
 	seats = new_seats
 	
 
-print Counter(seats[y][x] for y in range(len(seats)) for x in range(len(seats[0])))['#']
+print Counter(seats)['#']
