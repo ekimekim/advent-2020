@@ -31,32 +31,30 @@ DELTAS = [
 ]
 
 neighbors = [None for _ in range(len(seats))]
-def cast(seats, x, y, dx, dy):
-	# assume dy <= 0
-	while True:
-		x += dx
-		y += dy
-		if x < 0 or y < 0 or x >= ROW_LEN:
-			return None
-		c = seats[y * ROW_LEN + x]
-		if c != '.':
-			return x, y
-for y in range(COL_LEN):
-	for x in range(ROW_LEN):
-		if seats[y * ROW_LEN + x] == '.':
+for index in range(len(seats)):
+	if seats[index] == '.':
+		continue
+	y, x = divmod(index, ROW_LEN)
+	# note we only ever raycast upwards,
+	# we get the other direction by reversing the relation when we find someone
+	found = []
+	for dx, dy in DELTAS:
+		nx = x + dx
+		ny = y + dy
+		while nx >= 0 and ny >= 0 and nx < ROW_LEN:
+			c = seats[ny * ROW_LEN + nx]
+			if c != '.':
+				break
+			nx += dx
+			ny += dy
+		else:
 			continue
-		# note we only ever raycast upwards,
-		# we get the other direction by reversing the relation when we find someone
-		found = []
-		for dx, dy in DELTAS:
-			neighbor = cast(seats, x, y, dx, dy)
-			if neighbor:
-				# add both pairs. note the other neighbor is always behind us, so it's already
-				# got a list
-				found.append(neighbor)
-				nx, ny = neighbor
-				neighbors[ny * ROW_LEN + nx].append((x, y))
-		neighbors[y * ROW_LEN + x] = found
+
+		# add both pairs. note the other neighbor is always behind us, so it's already
+		# got a list
+		found.append((nx, ny))
+		neighbors[ny * ROW_LEN + nx].append((x, y))
+	neighbors[index] = found
 
 if TIMED:
 	postcast = monotonic()
