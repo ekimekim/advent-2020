@@ -18,6 +18,12 @@ seats = sum(seats, [])
 if TIMED:
 	precast = monotonic()
 
+DELTAS = [
+	(dx, dy)
+	for dx, dy in itertools.product((-1, 0, 1), (-1, 0, 1))
+	if dx != 0 or dy != 0
+]
+
 neighbors = [None for _ in range(len(seats))]
 def cast(seats, x, y, dx, dy):
 	while True:
@@ -31,7 +37,7 @@ def cast(seats, x, y, dx, dy):
 for y in range(COL_LEN):
 	for x in range(ROW_LEN):
 		found = []
-		for dx, dy in itertools.product((-1, 0, 1), (-1, 0, 1)):
+		for dx, dy in DELTAS:
 			if dx == 0 and dy == 0:
 				continue
 			neighbor = cast(seats, x, y, dx, dy)
