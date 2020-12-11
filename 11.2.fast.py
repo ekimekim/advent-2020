@@ -23,26 +23,37 @@ DELTAS = [
 	for dx, dy in itertools.product((-1, 0, 1), (-1, 0, 1))
 	if dx != 0 or dy != 0
 ]
+DELTAS = [
+	(-1, 0), # left
+	(-1, -1), # up-left
+	(0, -1), # up
+	(1, -1), # up-right
+]
 
 neighbors = [None for _ in range(len(seats))]
 def cast(seats, x, y, dx, dy):
+	# assume dy <= 0
 	while True:
 		x += dx
 		y += dy
-		if x < 0 or y < 0 or y >= COL_LEN or x >= ROW_LEN:
+		if x < 0 or y < 0 or x >= ROW_LEN:
 			return None
 		c = seats[y * ROW_LEN + x]
 		if c != '.':
 			return x, y
 for y in range(COL_LEN):
 	for x in range(ROW_LEN):
+		# note we only ever raycast right or down,
+		# we get the other direction by reversing the relation when we find someone
 		found = []
 		for dx, dy in DELTAS:
-			if dx == 0 and dy == 0:
-				continue
 			neighbor = cast(seats, x, y, dx, dy)
 			if neighbor:
+				# add both pairs. note the other neighbor is always behind us, so it's already
+				# got a list
 				found.append(neighbor)
+				nx, ny = neighbor
+				neighbors[ny * ROW_LEN + nx].append((x, y))
 		neighbors[y * ROW_LEN + x] = found
 
 if TIMED:
