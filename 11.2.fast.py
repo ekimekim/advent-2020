@@ -43,7 +43,9 @@ def cast(seats, x, y, dx, dy):
 			return x, y
 for y in range(COL_LEN):
 	for x in range(ROW_LEN):
-		# note we only ever raycast right or down,
+		if seats[y * ROW_LEN + x] == '.':
+			continue
+		# note we only ever raycast upwards,
 		# we get the other direction by reversing the relation when we find someone
 		found = []
 		for dx, dy in DELTAS:
