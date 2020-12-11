@@ -31,8 +31,8 @@ DELTAS = [
 ]
 
 neighbors = [None for _ in range(len(seats))]
-for index in range(len(seats)):
-	if seats[index] == '.':
+for index, char in enumerate(seats):
+	if char == '.':
 		continue
 	y, x = divmod(index, ROW_LEN)
 	# note we only ever raycast upwards,
@@ -62,24 +62,23 @@ if TIMED:
 
 def step(seats):
 	new_seats = seats[:]
-	for y in range(COL_LEN):
-		for x in range(ROW_LEN):
-			if seats[y * ROW_LEN + x] == '.':
-				continue
-			elif seats[y * ROW_LEN + x] == 'L':
-				for nx, ny in neighbors[y * ROW_LEN + x]: 
-					if seats[ny * ROW_LEN + nx] == '#':
-						break
-				else:
-					new_seats[y * ROW_LEN + x] = '#'
+	for index, char in enumerate(seats):
+		if char == '.':
+			continue
+		elif char == 'L':
+			for nx, ny in neighbors[index]: 
+				if seats[ny * ROW_LEN + nx] == '#':
+					break
 			else:
-				count = 0
-				for nx, ny in neighbors[y * ROW_LEN + x]: 
-					if seats[ny * ROW_LEN + nx] == '#':
-						count += 1
-						if count == 5:
-							new_seats[y * ROW_LEN + x] = 'L'
-							break
+				new_seats[index] = '#'
+		else:
+			count = 0
+			for nx, ny in neighbors[index]: 
+				if seats[ny * ROW_LEN + nx] == '#':
+					count += 1
+					if count == 5:
+						new_seats[index] = 'L'
+						break
 
 	return new_seats
 
