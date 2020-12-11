@@ -1,6 +1,11 @@
 import sys
+import os
 from collections import Counter
 import itertools
+
+TIMED = os.environ.get('TIMED')
+if TIMED:
+	from monotonic import monotonic
 
 seats = [
 	list(line.strip())
@@ -9,6 +14,9 @@ seats = [
 ROW_LEN = len(seats[0])
 COL_LEN = len(seats)
 seats = sum(seats, [])
+
+if TIMED:
+	precast = monotonic()
 
 neighbors = [None for _ in range(len(seats))]
 def cast(seats, x, y, dx, dy):
@@ -31,6 +39,9 @@ for y in range(COL_LEN):
 				found.append(neighbor)
 		neighbors[y * ROW_LEN + x] = found
 
+if TIMED:
+	postcast = monotonic()
+	print "Cast cache took:", postcast - precast
 
 def step(seats):
 	new_seats = seats[:]
@@ -65,6 +76,12 @@ while True:
 	if seats == new_seats:
 		break
 	seats = new_seats
-	
+
+if TIMED:
+	postrun = monotonic()
+	print "Run took:", postrun - postcast
 
 print Counter(seats)['#']
+
+if TIMED:
+	print "Count took:", monotonic() - postrun
