@@ -23,7 +23,6 @@ def step(seats):
 				for dx, dy in itertools.product((-1, 0, 1), (-1, 0, 1))
 				if dx != 0 or dy != 0
 			)
-#			print x, y, seats[y][x], c['#'], [get(seats, x+dx, y+dy) for dx, dy in itertools.product((-1, 0, 1), (-1, 0, 1)) if dx != 0 or dy != 0]
 			if seats[y][x] == 'L' and c['#'] == 0:
 				new_seats[y][x] = '#'
 			elif seats[y][x] == '#' and c['#'] >= 4:
@@ -35,14 +34,10 @@ def p(seats):
 
 while True:
 	new_seats = step(seats)
-#	p(seats)
-#	print "==="
-#	p(new_seats)
-#	print
-	print
+	p(new_seats)
 	if seats == new_seats:
 		break
 	seats = new_seats
 	
 
-print Counter(get(seats, x, y) for y in range(len(seats)) for x in range(len(seats[0])))['#']
+print Counter(seats[y][x] for y in range(len(seats)) for x in range(len(seats[0])))['#']

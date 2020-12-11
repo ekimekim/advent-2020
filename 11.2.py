@@ -27,7 +27,6 @@ def step(seats):
 				for dx, dy in itertools.product((-1, 0, 1), (-1, 0, 1))
 				if dx != 0 or dy != 0
 			)
-#			print x, y, seats[y][x], c
 			if seats[y][x] == 'L' and c['#'] == 0:
 				new_seats[y][x] = '#'
 			elif seats[y][x] == '#' and c['#'] >= 5:
@@ -39,10 +38,7 @@ def p(seats):
 
 while True:
 	new_seats = step(seats)
-	p(seats)
-	print "==="
 	p(new_seats)
-	print
 	print
 	if seats == new_seats:
 		break
