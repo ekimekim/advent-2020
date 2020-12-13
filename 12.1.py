@@ -23,10 +23,6 @@ transitions = {
 
 state = State(0, 0, 1)
 for action, value in actions:
-	print state
-	print action, value
 	state = transitions[action](state, value)
-	print state
-	print
 
 print abs(state.x) + abs(state.y)
