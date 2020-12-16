@@ -30,6 +30,7 @@ field_map = {
 	for index in range(len(yours))
 }
 
+# eliminate fields based on invalid values
 for ticket in [yours] + others:
 	for index, value in enumerate(ticket):
 		# filter out any fields where this value would be wrong
@@ -38,27 +39,25 @@ for ticket in [yours] + others:
 			if value in rules[field]
 		]
 		assert field_map[index], "no options left for index {}".format(index)
-		# eliminate any known fields
-		while True:
-			known = {fields[0]: index for index, fields in field_map.items() if len(fields) == 1}
-			new_field_map = {
-				index: [
-					field for field in fields
-					if field not in known or known[field] == index
-				]
-				for index, fields in field_map.items()
-			}
-			# loop until no changes
-			if new_field_map == field_map:
-				break
-			field_map = new_field_map
+
+# eliminate fields because we know they must go elsewhere
+prev_field_map = None
+while field_map != prev_field_map:
+	known = {fields[0]: index for index, fields in field_map.items() if len(fields) == 1}
+	prev_field_map = field_map
+	field_map = {
+		index: [
+			field for field in fields
+			if field not in known or known[field] == index
+		]
+		for index, fields in field_map.items()
+	}
 
 assert all(len(v) == 1 for v in field_map.values()), "no unique solution: {}".format(field_map)
-field_map = {v[0]: k for k, v in field_map.items()}
 
 mult = 1
-for field, index in field_map.items():
-	if not field.startswith("departure "):
+for index, fields in field_map.items():
+	if not fields[0].startswith("departure "):
 		continue
 	mult *= yours[index]
 
