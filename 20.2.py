@@ -99,12 +99,19 @@ data = [
 ]
 
 def find_monsters(data):
-	monster_re = (".{%d}" % (len(data) - 20)).join([
-		                  "#.",
-		"#....##....##....###",
-		".#..#..#..#..#..#",
-	])
-	return len(re.findall(monster_re, "".join(data)))
+	count = 0
+	for row in range(len(data) - 2):
+		for col in range(len(data)):
+			if all(
+				r.match(data[row+i][col:])
+				for i, r in enumerate([
+					re.compile("..................#."),
+					re.compile("#....##....##....###"),
+					re.compile(".#..#..#..#..#..#..."),
+				])
+			):
+				count += 1
+	return count
 
 flipped = data[::-1]
 monsters = max(find_monsters(d) for d in [
