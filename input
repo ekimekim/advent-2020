@@ -2,4 +2,4 @@
 
 DAY=${1:?day}
 
-curl -LsS https://adventofcode.com/2021/day/$DAY/input -H "Cookie: $(cat .cookie)"
+curl -LsS https://adventofcode.com/2022/day/$DAY/input -H "Cookie: $(cat .cookie)"
