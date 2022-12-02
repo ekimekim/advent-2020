@@ -6,8 +6,10 @@ strats = [
 	for line in sys.stdin.read().strip().split("\n")
 ]
 
-def score(a, b):
-	result = (1 + (ord(b) - ord("X")) - (ord(a) - ord("A"))) % 3
-	return 1 + "XYZ".index(b) + 3 * result
+def score(theirs, ours):
+	theirs = ord(theirs) - ord('A')
+	ours = ord(ours) - ord('X')
+	result = (1 + ours - theirs) % 3
+	return 1 + ours + 3 * result
 
 print sum(score(a, b) for a, b in strats)
