@@ -7,12 +7,13 @@ map(
 	(.[:$len/2] | explode) as $left |
 	.[$len/2:] |
 	explode |
+	unique |
 	.[] |
-	select([.]|inside($left)|not) |
+	select([.]|inside($left)) |
 	if . >= 97 then
-		. - 97
+		1 + . - 97
 	else
-		. - 41
+		27 + . - 65
 	end
 ) |
 add
