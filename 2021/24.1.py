@@ -65,6 +65,13 @@ for instr in instrs:
 			for b_s, b_b in bv:
 				result.append((a_s * b_s, tuple(sorted(a_b + b_b))))
 		new = tuple(result)
+	elif op == 'mod' and av == ():
+		# 0 mod anything is 0
+		new = ()
+	elif op == 'eql' and av == bv:
+		# not likely, but if the two sides are symbolically equal they MUST be equal
+		# note the inverse is not true
+		new = scalar(1)
 	else:
 		# we can't do anything sensible here
 		new = wrap(op, av, bv)
