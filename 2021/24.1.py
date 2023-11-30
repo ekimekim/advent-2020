@@ -23,6 +23,7 @@ for instr in instrs:
 	bv = parse(b)
 	regs[a] = (op, av, bv)
 
+ZERO = ('literal', 0)
 def simplify(node):
 	if node[0] == 'literal':
 		return node
@@ -31,13 +32,13 @@ def simplify(node):
 	op, a, b = node
 	a = simplify(a)
 	b = simplify(b)
-	al = a[1] if a[0] == 'literal' else None
-	bl = b[1] if b[0] == 'literal' else None
 	if op == 'mul':
-		if al == 0 or bl == 0:
-			return ('literal', 0)
+		if ZERO in (a, b):
+			return ZERO
 	if op == 'div':
-		if al == 0:
-			return 
+		if a == ZERO:
+			return ZERO
+	return node, a, b
 
-print regs['z']
+z = simplify(regs['z'])
+print z
