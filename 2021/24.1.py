@@ -23,22 +23,31 @@ for instr in instrs:
 	bv = parse(b)
 	regs[a] = (op, av, bv)
 
-ZERO = ('literal', 0)
-def simplify(node):
-	if node[0] == 'literal':
-		return node
-	if node[0] == 'digit':
-		return node
-	op, a, b = node
-	a = simplify(a)
-	b = simplify(b)
-	if op == 'mul':
-		if ZERO in (a, b):
-			return ZERO
-	if op == 'div':
-		if a == ZERO:
-			return ZERO
-	return node, a, b
+# condition is a list of 14 digits, each digit is a non-empty frozenset of allowed numbers
+# if a set would be empty, the whole thing is None (contradiction)
+TOP = (frozenset(range(1, 10)),) * 14
 
-z = simplify(regs['z'])
-print z
+def merge(a, b):
+	if None in (a, b):
+		return None
+	ret = tuple(
+		ad & bd
+		for ad, bd in zip(a, b)
+	)
+	if frozenset() in ret:
+		return None
+	return ret
+
+
+def solve(value, targets):
+	if value[0] == 'literal':
+		# literals either allow any digit, or indicate a contradiction
+		if value[1] in targets:
+			return TOP
+		else:
+			return None
+	if value[0] == 'digit':
+		# digit values give no information
+
+z = regs['z']
+solve(z, [0])
