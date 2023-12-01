@@ -1,11 +1,13 @@
-use std::io::stdin;
+use std::io::{stdin, Read};
 
 const DIGITS: [&[u8]; 9] = [b"one", b"two", b"three", b"four", b"five", b"six", b"seven", b"eight", b"nine"];
 
 fn main() {
-	let result: usize = stdin().lines().map(|line| {
-		let line = line.unwrap();
-		let line = line.as_bytes();
+	let mut input: Vec<u8> = Vec::new();
+	let mut buf = stdin().lock();
+	buf.read_to_end(&mut input).unwrap();
+	
+	let result: usize = input.as_slice().split(|c| *c as char == '\n').filter(|line| line.len() > 0).map(|line| {
 		let mut first: Option<usize> = None;
 		'first: for (i, c) in line.iter().enumerate() {
 			let as_digit: u8 = c - ('0' as u8);
