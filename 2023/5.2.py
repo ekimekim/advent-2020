@@ -1,4 +1,6 @@
 import sys
+import time
+START = time.time()
 
 sections = sys.stdin.read().strip().split("\n\n")
 
@@ -73,3 +75,4 @@ for start, len in seeds:
 	locations += values
 
 print min(start for start, length in locations)
+print time.time() - START
