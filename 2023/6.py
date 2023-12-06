@@ -25,7 +25,6 @@ def get_range(time, distance):
 	min = math.floor(time/2. - disc)
 	max = math.ceil(time/2. + disc)
 	return int(max - min) - 1 # fencepost issue: [min, max] is end-inclusive
-	product *= range
 
 product = 1
 for time, distance in zip(times, distances):
