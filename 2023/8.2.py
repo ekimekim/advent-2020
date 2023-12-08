@@ -1,6 +1,7 @@
 
 import sys
 import itertools
+import math
 
 dirs, nodes = sys.stdin.read().strip().split("\n\n")
 dirs = [0 if c == "L" else 1 for c in dirs]
@@ -28,21 +29,26 @@ def find_loop(node):
 		node = nodes[node][dir]
 		dirpos = (dirpos + 1) % len(dirs)
 
-def gen_ends(loop):
-	start, length, ends = loop
-	for loop_start in itertools.count(start, length):
-		for end in ends:
-			yield loop_start + end
-
 starts = [node for node in nodes if node.endswith("A")]
 loops = [find_loop(start) for start in starts]
-gens = [gen_ends(loop) for loop in loops]
-nexts = [next(gen) for gen in gens]
-while True:
-	# if they're all the same, we're done
-	if len(set(nexts)) == 1:
-		print nexts[0]
-		break
-	# otherwise, find the soonest next end (by index) and advance it
-	soonest = min(range(len(nexts)), key=lambda i: nexts[i])
-	nexts[soonest] = next(gens[soonest])
+for start, loop in zip(starts, loops):
+	print(start, loop)
+
+# Simplify out loop lead-in time by rotating the loops to start at the same point
+start_at = max(start for start, length, ends in loops)
+new_loops = []
+for start, length, ends in loops:
+	rotate_by = start_at - start
+	ends = [(end - rotate_by) % length for end in ends]
+	new_loops.append((length, ends))
+loops = new_loops
+
+# The input seems to always have the ends be at a multiple of the loop length in terms of total
+# steps. Validate this and we can simplify out the end points.
+for length, ends in loops:
+	assert len(ends) == 1
+	end = ends[0]
+	assert end + start_at == length
+loops = [length for length, ends in loops]
+
+print(math.lcm(*loops))
