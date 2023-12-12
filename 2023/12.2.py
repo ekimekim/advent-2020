@@ -21,8 +21,12 @@ def solve(values, runs, current=0):
 			current = 0
 			continue
 		if c == "#":
-			# add to current run
+			# add to current run. if we weren't expecting any more runs, fail fast.
 			current += 1
+			if run_idx == len(runs):
+				return 0
+			if runs[run_idx] < current:
+				return 0
 			continue
 		# we have an unknown. try each option.
 		remaining_values = values[i+1:]
