@@ -8,20 +8,21 @@ def hash(s):
 	return t
 
 steps = sys.stdin.read().strip().split(",")
-print "part 1", sum(map(hash, steps))
+print("part 1", sum(map(hash, steps)))
 
-boxes = [[] for _ in range(256)]
+boxes = [{} for _ in range(256)]
 for step in steps:
 	if step.endswith("-"):
 		key = step[:-1]
 		box = boxes[hash(key)]
-		boxes[hash(key)] = [(k, v) for k, v in box if k != key]
+		box.pop(key, None)
 	else:
 		key, value = step.split("=")
 		box = boxes[hash(key)]
-		for i, (k, v) in enumerate(box):
-			if k == key:
-				box[i] = key, value
-				break
-		else:
-			box.insert((key, value), 0)
+		box[key] = int(value)
+
+print("part 2", sum(
+	(b + 1) * (i + 1) * value
+	for b, box in enumerate(boxes)
+	for i, value in enumerate(box.values())
+))
