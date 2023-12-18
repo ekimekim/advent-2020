@@ -89,8 +89,8 @@ def find_inside(outline):
 # add that to the inside area if the edge borders an outer inside block.
 # Finally, all this needs to be done recursively so we can break up into smaller and smaller blocks.
 
-SCALES = [10^i for i in range(6)][::-1]
-area = 0
-unknowns = 
-for scale in scales:
-	for block in unknowns:
+def resolve(scale, x, y):
+	"""Resolve the block at (x,y) within the given scale,
+	returning a list of (edges, area reachable from those edges) for each connected group of edges,
+	plus the fully-internal area."""
+
