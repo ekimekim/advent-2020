@@ -13,7 +13,7 @@ for each y
 	y = next spot where points aren't all the same
 """
 
-PART2 = False
+PART2 = True
 
 from collections import namedtuple
 import bisect
@@ -63,7 +63,7 @@ def maxima(regions):
 min_x, max_x, min_y, max_y = maxima(outline)
 x = min_x
 area = 0
-DEBUG_X = -163
+DEBUG_X = -100
 def d(*args):
 	if x == DEBUG_X:
 		print args
@@ -83,19 +83,29 @@ while x <= max_x:
 		region.right + 1 for region in outline
 		if region.right >= x
 	])
+	prev_is_vert = False
+	outline_on_right = False
 	for region in in_line:
 		if region.left == region.right:
 			y = region.bottom
+			prev_is_vert = True
 			continue
 		length = region.top - y
 		d(y, "to", region, "(length", length, "), inside = ", inside)
 		y = region.bottom + 1
+		new_outline_on_right = region.right > x
 		if inside:
 			total += length
-		inside = not inside
+		if prev_is_vert and outline_on_right != new_outline_on_right:
+			pass # Z pattern, don't flip inside
+		else:
+			inside = not inside
+		outline_on_right = new_outline_on_right
+		prev_is_vert = False
 	width = next_x - x
 	print "x = {} to {}: {} length * {} width = {}".format(x, next_x, total, width, total * width)
 	area += total * width
+	print "new total", area
 	x = next_x
 print "inside", area
 print "outline", outline_area
