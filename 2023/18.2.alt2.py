@@ -63,13 +63,16 @@ def maxima(regions):
 min_x, max_x, min_y, max_y = maxima(outline)
 x = min_x
 area = 0
+DEBUG_X = -163
+def d(*args):
+	if x == DEBUG_X:
+		print args
 while x <= max_x:
 	in_line = [
 		region for region in outline
 		if region.left <= x <= region.right
 	]
 	in_line.sort(key = lambda r: (r.top, r.bottom))
-	print "x =", x
 	inside = False
 	y = min_y - 1
 	total = 0
@@ -85,14 +88,15 @@ while x <= max_x:
 			y = region.bottom
 			continue
 		length = region.top - y
-		print y, "to", region, "(length", length, "), inside = ", inside
+		d(y, "to", region, "(length", length, "), inside = ", inside)
 		y = region.bottom + 1
 		if inside:
 			total += length
 		inside = not inside
 	width = next_x - x
-	print "got", total, "*", width
+	print "x = {} to {}: {} length * {} width = {}".format(x, next_x, total, width, total * width)
 	area += total * width
 	x = next_x
-print "inside area", area
+print "inside", area
+print "outline", outline_area
 print area + outline_area

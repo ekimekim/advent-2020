@@ -50,13 +50,20 @@ for x in range(min_x, max_x + 1):
 		else:
 			inside |= current
 
+DEBUG_X = -163
 for y in range(min_y, max_y + 1):
 	print "".join(
-		"o" if (x, y) in outline else
-		"i" if (x, y) in inside else
-		"."
+		("\x1b[31m" if x == DEBUG_X else "")
+		+ (
+			"o" if (x, y) in outline else
+			"i" if (x, y) in inside else
+			"."
+		) + "\x1b[m"
 		for x in range(min_x, max_x + 1)
 	)
+
+for x in range(min_x, max_x + 1):
+	print "x = {}: {}".format(x, len([1 for ix, iy in inside if ix == x]))
 
 print "inside", len(inside)
 print "outline", len(outline)
