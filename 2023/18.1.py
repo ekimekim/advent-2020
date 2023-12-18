@@ -58,4 +58,6 @@ for y in range(min_y, max_y + 1):
 		for x in range(min_x, max_x + 1)
 	)
 
+print "inside", len(inside)
+print "outline", len(outline)
 print len(inside) + len(outline)

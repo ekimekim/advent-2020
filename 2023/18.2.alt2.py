@@ -25,6 +25,7 @@ lines = sys.stdin.read().strip().split("\n")
 outline = []
 x = 0
 y = 0
+outline_area = 0
 for line in lines:
 	dir, length, color = line.split()
 	if PART2:
@@ -42,6 +43,7 @@ for line in lines:
 	end_y = y + length * dy
 	sort = lambda *t: tuple(sorted(t))
 	outline.append(Region(*(sort(x, end_x) + sort(y, end_y))))
+	outline_area += length
 	x = end_x
 	y = end_y
 
@@ -66,19 +68,31 @@ while x <= max_x:
 		region for region in outline
 		if region.left <= x <= region.right
 	]
+	in_line.sort(key = lambda r: (r.top, r.bottom))
 	print "x =", x
-	print "\n".join("\t{}".format(region) for region in in_line)
 	inside = False
-	y = min_y
-	length = 0
-	next_x = max_x + 1
+	y = min_y - 1
+	total = 0
+	next_x = min([max_x + 1] + [
+		region.left for region in outline
+		if region.left > x
+	] + [
+		region.right + 1 for region in outline
+		if region.right >= x
+	])
 	for region in in_line:
-		if inside:
-			length += region.top - y
+		if region.left == region.right:
+			y = region.bottom
+			continue
+		length = region.top - y
+		print y, "to", region, "(length", length, "), inside = ", inside
 		y = region.bottom + 1
+		if inside:
+			total += length
 		inside = not inside
-		next_x = min(next_x, region.right + 1)
-	assert not inside
 	width = next_x - x
-	area += length * width
+	print "got", total, "*", width
+	area += total * width
 	x = next_x
+print "inside area", area
+print area + outline_area
