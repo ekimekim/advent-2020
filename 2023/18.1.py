@@ -50,7 +50,6 @@ for x in range(min_x, max_x + 1):
 		else:
 			inside |= current
 
-DEBUG_X = -100
 for y in range(min_y, max_y + 1):
 	print "".join(
 		("\x1b[31m" if x == DEBUG_X else "")
@@ -62,12 +61,4 @@ for y in range(min_y, max_y + 1):
 		for x in range(min_x, max_x + 1)
 	)
 
-running = 0
-for x in range(min_x, max_x + 1):
-	count = len([1 for ix, iy in inside if ix == x])
-	running += count
-	print "x = {}: {} (total {})".format(x, count, running)
-
-print "inside", len(inside)
-print "outline", len(outline)
 print len(inside) + len(outline)
