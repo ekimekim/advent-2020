@@ -2,12 +2,12 @@
 import sys
 
 lines = sys.stdin.read().strip().split("\n")
-outline = {} # (x, y): color
+outline = set() # ((start_x, end_x), (start_y, end_y)), ranges inclusive
 x = 0
 y = 0
 for line in lines:
 	_, _, color = line.split()
-	steps = int(color[2:7], 16)
+	length = int(color[2:7], 16)
 	dir = "RDLU"[int(color[7])]
 	dx, dy = {
 		"U": (0, -1),
@@ -15,24 +15,34 @@ for line in lines:
 		"L": (-1, 0),
 		"R": (1, 0),
 	}[dir]
-	for _ in range(int(steps)):
-		x += dx
-		y += dy
-		outline[x, y] = color
+	end_x = x + length * dx
+	end_y = y + length * dy
+	sort = lambda *t: tuple(sorted(t))
+	outline.add((sort(x, end_x), sort(y, end_y)))
+	x = end_x
+	y = end_y
 
 assert x == 0 and y == 0
 
-def scale(nodes, factor):
-	return set((x // factor, y // factor) for x, y in nodes)
+def expand(nodes):
+	return set(
+		(x, y)
+		for (xa, xb), (ya, yb) in nodes
+		for x in range(xa, xb + 1)
+		for y in range(ya, yb + 1)
+	)
 
-def draw(nodes):
-	min_x = min(x for x, y in nodes)
-	max_x = max(x for x, y in nodes)
-	min_y = min(y for x, y in nodes)
-	max_y = max(y for x, y in nodes)
+def scale(nodes, factor):
+	return set(((xa // factor, xb // factor), (ya // factor, yb // factor)) for (xa, xb), (ya, yb) in nodes)
+
+def draw(expanded):
+	min_x = min(x for x, y in expanded)
+	max_x = max(x for x, y in expanded)
+	min_y = min(y for x, y in expanded)
+	max_y = max(y for x, y in expanded)
 	for y in range(min_y, max_y + 1):
 		print "".join(
-			"#" if (x, y) in nodes else "."
+			"#" if (x, y) in expanded else "."
 			for x in range(min_x, max_x + 1)
 		)
 
@@ -67,4 +77,7 @@ def find_inside(outline):
 				inside |= current
 	return inside
 
-draw(scale(outline, 1000000))
+print outline
+print scale(outline, 100000)
+print expand(scale(outline, 100000))
+draw(expand(scale(outline, 100000)))
