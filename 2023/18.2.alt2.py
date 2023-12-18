@@ -19,9 +19,10 @@ from collections import namedtuple
 import bisect
 import sys
 
+Region = namedtuple("Region", ["left", "right", "top", "bottom"])
+
 lines = sys.stdin.read().strip().split("\n")
-verts = []
-horis = []
+outline = []
 x = 0
 y = 0
 for line in lines:
@@ -40,21 +41,15 @@ for line in lines:
 	end_x = x + length * dx
 	end_y = y + length * dy
 	sort = lambda *t: tuple(sorted(t))
-	if dir in "UD":
-		verts.append((x, sort(y, end_y)))
-	else:
-		horis.append((y, sort(x, end_x)))
+	outline.append(Region(*(sort(x, end_x) + sort(y, end_y))))
 	x = end_x
 	y = end_y
 
 assert x == 0 and y == 0
-verts.sort()
-horis.sort()
+outline.sort()
 
-print "vert"
-print "\n".join(map(str, verts))
-print "hori"
-print "\n".join(map(str, horis))
+print "OUTLINE"
+print "\n".join(map(str, outline))
 
 def maxima(regions):
 	min_x = min(region.left for region in regions)
@@ -67,15 +62,17 @@ min_x, max_x, min_y, max_y = maxima(outline)
 x = min_x
 area = 0
 while x <= max_x:
-	crossings = [
-		(y, ex) for y, (sx, ex) in horis
-		if sx <= x <= ex
+	in_line = [
+		region for region in outline
+		if region.left <= x <= region.right
 	]
+	print "x =", x
+	print "\n".join("\t{}".format(region) for region in in_line)
 	inside = False
 	y = min_y
 	length = 0
 	next_x = max_x + 1
-	for crossing, right in in_line:
+	for region in in_line:
 		if inside:
 			length += region.top - y
 		y = region.bottom + 1
