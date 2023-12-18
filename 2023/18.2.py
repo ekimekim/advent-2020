@@ -77,7 +77,4 @@ def find_inside(outline):
 				inside |= current
 	return inside
 
-print outline
-print scale(outline, 100000)
-print expand(scale(outline, 100000))
-draw(expand(scale(outline, 100000)))
+draw(expand(scale(outline, 1000000)))
