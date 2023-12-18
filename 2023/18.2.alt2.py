@@ -19,10 +19,9 @@ from collections import namedtuple
 import bisect
 import sys
 
-Region = namedtuple("Region", ["left", "right", "top", "bottom"])
-
 lines = sys.stdin.read().strip().split("\n")
-outline = []
+verts = []
+horis = []
 x = 0
 y = 0
 for line in lines:
@@ -41,15 +40,21 @@ for line in lines:
 	end_x = x + length * dx
 	end_y = y + length * dy
 	sort = lambda *t: tuple(sorted(t))
-	outline.append(Region(*(sort(x, end_x) + sort(y, end_y))))
+	if dir in "UD":
+		verts.append((x, y, end_y))
+	else:
+		horis.append((y, x, end_x))
 	x = end_x
 	y = end_y
 
 assert x == 0 and y == 0
-outline.sort()
+verts.sort()
+horis.sort()
 
-print "OUTLINE"
-print "\n".join(map(str, outline))
+print "vert"
+print "\n".join(map(str, verts))
+print "hori"
+print "\n".join(map(str, horis))
 
 def maxima(regions):
 	min_x = min(region.left for region in regions)
@@ -66,8 +71,6 @@ while x <= max_x:
 		region for region in outline
 		if region.left <= x <= region.right
 	]
-	print "x =", x
-	print "\n".join("\t{}".format(region) for region in in_line)
 	inside = False
 	y = min_y
 	length = 0
