@@ -35,11 +35,15 @@ def expand(nodes):
 def scale(nodes, factor):
 	return set(((xa // factor, xb // factor), (ya // factor, yb // factor)) for (xa, xb), (ya, yb) in nodes)
 
-def draw(expanded):
+def maxima(expanded):
 	min_x = min(x for x, y in expanded)
 	max_x = max(x for x, y in expanded)
 	min_y = min(y for x, y in expanded)
 	max_y = max(y for x, y in expanded)
+	return min_x, max_x, min_y, max_y
+
+def draw(expanded):
+	min_x, max_x, min_y, max_y = maxima(expanded)
 	for y in range(min_y, max_y + 1):
 		print "".join(
 			"#" if (x, y) in expanded else "."
@@ -47,10 +51,7 @@ def draw(expanded):
 		)
 
 def find_inside(outline):
-	min_x = min(x for x, y in outline)
-	max_x = max(x for x, y in outline)
-	min_y = min(y for x, y in outline)
-	max_y = max(y for x, y in outline)
+	min_x, max_x, min_y, max_y = maxima(outline)
 	inside = set()
 	outside = set()
 	for x in range(min_x, max_x + 1):
@@ -77,4 +78,19 @@ def find_inside(outline):
 				inside |= current
 	return inside
 
-draw(expand(scale(outline, 1000000)))
+# The approach here is to break it down into large blocks,
+# a block is known to be either empty or containing part of the outline.
+# If we are connected to the outside by empty blocks, we're outside.
+# An empty block region not connected to the outside by empty blocks MIGHT be inside.
+# It depends on the shape of the outline-containing blocks.
+# We need to zoom in and check the connectivity of each face in the inner block.
+# (this can be cached).
+# Also for each inner block we need to find the area reachable from each edge so we can
+# add that to the inside area if the edge borders an outer inside block.
+# Finally, all this needs to be done recursively so we can break up into smaller and smaller blocks.
+
+SCALES = [10^i for i in range(6)][::-1]
+area = 0
+unknowns = 
+for scale in scales:
+	for block in unknowns:
