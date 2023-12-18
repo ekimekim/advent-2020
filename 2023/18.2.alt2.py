@@ -41,9 +41,9 @@ for line in lines:
 	end_y = y + length * dy
 	sort = lambda *t: tuple(sorted(t))
 	if dir in "UD":
-		verts.append((x, y, end_y))
+		verts.append((x, sort(y, end_y)))
 	else:
-		horis.append((y, x, end_x))
+		horis.append((y, sort(x, end_x)))
 	x = end_x
 	y = end_y
 
@@ -67,15 +67,15 @@ min_x, max_x, min_y, max_y = maxima(outline)
 x = min_x
 area = 0
 while x <= max_x:
-	in_line = [
-		region for region in outline
-		if region.left <= x <= region.right
+	crossings = [
+		(y, ex) for y, (sx, ex) in horis
+		if sx <= x <= ex
 	]
 	inside = False
 	y = min_y
 	length = 0
 	next_x = max_x + 1
-	for region in in_line:
+	for crossing, right in in_line:
 		if inside:
 			length += region.top - y
 		y = region.bottom + 1
