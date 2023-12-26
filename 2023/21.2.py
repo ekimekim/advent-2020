@@ -52,7 +52,7 @@ assert even(HALF_SIZE)
 # start and on the near edge (eg. center-left when going right).
 
 def get_counts(sx, sy, limit=None):
-	if limit < 0:
+	if limit is not None and limit < 0:
 		return (0, 0)
 	queue = [(0, sx, sy)]
 	seen = set()
@@ -81,8 +81,10 @@ STEPS = int(sys.argv[1]) if len(sys.argv) > 1 else 26501365
 
 def cardinal_counts(sx, sy):
 	counts = get_counts(sx, sy)
+	print "from", sx, sy, "we get", counts
 	# count number of complete cycles (2 widths)
 	full, remaining = divmod(STEPS - HALF_SIZE, 2 * SIZE)
+	print "in", STEPS - HALF_SIZE, "we have", full, "full cycles"
 	# step backwards once so we know full always covers complete cycles.
 	full -= 1
 	remaining += 2 * SIZE
@@ -96,6 +98,7 @@ def cardinal_counts(sx, sy):
 		full_counts = add(full_counts, counts)
 		odd = not odd
 		remaining -= SIZE
+	print full_counts
 	return full_counts
 
 def diagonal_counts(sx, sy):
@@ -131,13 +134,16 @@ def diagonal_counts(sx, sy):
 		# since remaining < 4 * SIZE, the final corner is impossible
 	)
 
-	return add(
+	result = add(
 		full_counts,
 		mul(full + 1, major_remainder),
 		mul(full + 2, minor_remainder),
 	)
+	print result
+	return result
 
 center = get_counts(sx, sy)
+print center
 left = cardinal_counts(width - 1, sy)
 right = cardinal_counts(0, sy)
 up = cardinal_counts(sx, height - 1)
