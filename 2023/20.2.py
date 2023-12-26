@@ -1,4 +1,5 @@
 
+import math
 import sys
 from collections import namedtuple
 
@@ -53,9 +54,9 @@ def run(modules, start_module, start_signal, output_module):
 def graph(modules):
 	for name, module in modules.items():
 		color = {"%": "green", "&": "blue"}.get(module.type, "black")
-		print "[ %s ] { color: %s; }" % (name, color)
+		print("[ %s ] { color: %s; }" % (name, color))
 		for output in module.outputs:
-			print "[ %s ] -> [ %s ]" % (name, output)
+			print("[ %s ] -> [ %s ]" % (name, output))
 
 def split_graph(modules):
 	# Looking at the input, it is divided into subgraphs that all take input from
@@ -90,15 +91,15 @@ assert modules[pre_rx].type == "&", "unexpected graph shape"
 """
 Each subgraph is of form:
 	a -> b -> ... -> c
-where all are flip-flops, plus a central &x which takes output from all of them
-and sends input to a plus one other. Finally there's a &y which does nothing but invert x.
+where all are flip-flops, plus a central &x which takes output from SOME of them
+and sends input to SOME of them. Finally there's a &y which does nothing but invert x.
 Since we want y's output to be high, we want x's output to be low. This happens when all
 the flip-flops are high. But this also causes a to flip, so it's only ever high in the middle of
 a press. So all subgraphs need it to happen at the same time.
 
 Think of the chain of flip-flops as a binary counter. It counts presses (low inputs)
-until it reaches all 1s, at which point the x node adds 1 (by flipping a) AND adds 2^n
-(by flipping some other node). In other words the counter resets to 2^n.
+until it reaches all 1s in x-connected bits, at which point the x node adds 2^n
+(for some n) for each node it's connected to.
 """
 
 def analyze_subgraph(subgraph):
@@ -113,42 +114,51 @@ def analyze_subgraph(subgraph):
 	# Discover chain of flip-flops
 	name = initial
 	chain = []
+	to_conj = []
 	found_conj = set()
 	while True:
 		chain.append(name)
 		out_ffs = [output for output in subgraph[name].outputs if subgraph[output].type == "%"]
 		out_conj = [output for output in subgraph[name].outputs if subgraph[output].type == "&"]
-		print name, out_conj
-		assert len(out_conj) == 1
-		found_conj.add(out_conj[0])
+		if out_conj:
+			to_conj.append(name)
+			found_conj.add(out_conj[0])
 		if len(out_ffs) != 1:
 			break
 		name = out_ffs[0]
 
 	# Assert they all connect to the same conj
 	assert len(found_conj) == 1
-	main_conj = found_conj[0]
+	main_conj, = found_conj
 
 	# Assert the main conj connects to one other, then out.
 	not_conj = [output for output in subgraph[main_conj].outputs if subgraph[output].type == "&"]
 	assert len(not_conj) == 1
+	not_conj, = not_conj
 	assert subgraph[not_conj].outputs == ["out"]
 
 	# We should have now discovered all nodes
 	assert set(chain) | {main_conj, not_conj, "in"} == set(subgraph)
 
 	# Length of flip flop chain is the number of bits in counter.
-	# It resets at the max value.
-	reset_at = 2**len(chain) - 1
+	counter_size = 2**len(chain)
+
+	# It matches when all the bits in to_conj are high
+	match_at = sum(2**chain.index(name) for name in to_conj)
 
 	# First element of counter has value 1, then 2, 4, etc. Determine total value
-	# added upon reset.
-	# Since we reset at max - 1, we subtract 1 to get the new value after reset.
-	reset_adds = sum(2**chain.index(output) for output in main_conj if output in chain)
-	resets_to = reset_adds - 1
+	# added upon match.
+	match_adds = sum(2**chain.index(output) for output in subgraph[main_conj].outputs if output in chain)
 
-	# So we first run to reset_at, then we loop every reset_at - resets_to.
-	return reset_at, reset_at - resets_to
+	# We observe that the match_at value + the match_adds value always exactly causes the counter to reset.
+	assert match_at + match_adds == counter_size
+	# This means the loop period is just match_at.
 
-for subgraph in subgraphs:
-	print analyze_subgraph(subgraph)
+	return counter_size, match_at
+
+analyses = [analyze_subgraph(subgraph) for subgraph in subgraphs]
+assert len(set(size for size, period in analyses)) == 1
+# Since they're all the same size, they match up simply with LCM of the loop periods.
+periods = [period for size, period in analyses]
+
+print(math.lcm(*periods))
