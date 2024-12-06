@@ -1,0 +1,14 @@
+#!/bin/bash
+
+set -eu
+
+DAY=${1:?day}
+CACHE=".day$DAY.input"
+TEMP="$CACHE.temp"
+
+if [ -f "$CACHE" ]; then
+	cat "$CACHE"
+else
+	curl -LsSf https://adventofcode.com/2019/day/$DAY/input -H "Cookie: $(cat .cookie)" | tee "$TEMP"
+	mv "$TEMP" "$CACHE"
+fi
